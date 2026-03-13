@@ -1,0 +1,23 @@
+# Experiment settings
+folder: FOLDER_NAME
+rollout_root: PATH_TO/handelbot/rollouts_rl/
+starting_pos_l: [0.547, -0.05, 0.252]
+starting_pos_r: [0.555, 0.12, 0.297]
+max_iterations: 10
+sheet_music: PATH_TO/handelbot/music_data/hotcrossbuns.pkl 
+
+# Policy Config
+root: PATH_TO/handelbot
+left_folder: YOUR_LEFT_FOLDER
+right_folder: YOUR_RIGHT_FOLDER
+device: cuda
+warmup_duration_s: 3.0
+
+# Optimization flags
+use_momentum_damping: true
+use_chunk_annealing: false
+
+# Action space
+action_dim: 20
+action_idxs: [4, 5, 6, 8, 9, 10, 12, 13, 14, 17]
+action_high: [0.95, 0.15, 0.15, 0.95, 0.15, 0.15, 0.95, 0.15, 0.15, 0.5]

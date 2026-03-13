@@ -1,0 +1,28 @@
+# Experiment settings
+folder: FOLDER_NAME
+rollout_root: PATH_TO/handelbot/rollouts_rl/
+starting_pos_l: [0.547, -0.05, 0.252]
+starting_pos_r: [0.555, 0.12, 0.297]
+sheet_music: PATH_TO/handelbot/music_data/hotcrossbuns.pkl 
+
+# Policy Config
+root: PATH_TO/handelbot
+left_folder: YOUR_LEFT_FOLDER
+right_folder: YOUR_RIGHT_FOLDER
+device: cuda
+warmup_duration_s: 3.0
+
+# Offsets to iterate through [x, y, z]
+left_offsets:
+  - [0.022, 0.033, -0.03]
+  - [0.022, 0.033, -0.03]
+  - [0.022, 0.033, -0.03]
+  - [0.022, 0.033, -0.03]
+  - [0.022, 0.033, -0.03]
+
+right_offsets:
+  - [0.03, 0.01, 0.01]
+  - [0.03, 0.01, 0.01]
+  - [0.03, 0.01, 0.01]
+  - [0.03, 0.01, 0.01]
+  - [0.03, 0.01, 0.01]

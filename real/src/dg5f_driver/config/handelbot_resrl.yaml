@@ -1,0 +1,70 @@
+# Experiment settings
+folder: FOLDER_NAME
+rollout_root: PATH_TO/handelbot/rollouts_rl/
+root: PATH_TO/handelbot
+left_folder: YOUR_LEFT_FOLDER
+right_folder: YOUR_RIGHT_FOLDER
+left_hand_folder: YOUR_LEFT_HAND_FOLDER
+right_hand_folder: YOUR_RIGHT_HAND_FOLDER
+warmup_duration_s: 3.0
+seed: 8
+cuda: true
+track: false
+wandb_project_name: "ManiSkill"
+wandb_entity: null
+wandb_group: "SAC"
+save_model: true
+checkpoint: null
+sheet_music: PATH_TO/handelbot/music_data/hotcrossbuns.pkl
+log_freq: 20
+save_freq: 1000
+eval_ckpt_freq: 20000
+full_reset_freq: 20
+
+# Algorithm specific arguments
+from_scratch: false
+chunk_size: 2
+guided_noise: true
+guided_noise_prob: 0.5
+n_critics: 2
+total_grad_updates: 1000000
+buffer_size: 1000000
+key_on_curriculum: [[0.7, 10000], [0.5, -1]] # [(key_on, n_steps)]
+buffer_device: "cuda"
+gamma: 0.8
+tau: 0.005
+batch_size: 2048
+zmq_batch_size: 32
+learning_starts: 512
+policy_lr: 1.0e-3
+q_lr: 1.0e-3
+target_network_frequency: 1
+utd: 8
+update_actor_every: 10
+update_critic_every: 1
+bootstrap_at_done: "always" 
+
+# Architecture
+dropout: 0.5
+layernorm: true
+actor_hidden_dims: [256, 256, 256]
+critic_hidden_dims: [256, 256, 256]
+
+# critic 
+target_noise: [0.02, 0.015, 0.015, 0.02, 0.015, 0.015, 0.02, 0.015, 0.015] 
+noise_clip: [0.08, 0.075, 0.075, 0.08, 0.075, 0.075, 0.08, 0.075, 0.075] 
+
+# actor
+n_policy_noise_warmup_steps: 10000
+init_policy_noise: [0.04, 0.03, 0.03, 0.04, 0.03, 0.03, 0.04, 0.03, 0.03]
+policy_noise: [0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01, 0.01]
+grad_clip: 5
+noise_beta: 0.2
+
+# Dimensions
+obs_dim_left: 371 # 20 (targetqpos) + 26 (proprio) + 45 (MIDI) + 495 (goal 11 x 45) + 55 (fingering 11 x 5 OR 11 x 5 x 45 = 2475 for detailed fingering)
+obs_dim_right: 357 # 20 (targetqpos) + 26 (proprio) + 43 (MIDI) + 473 (goal 11 x 43) + 55 (fingering 11 x 5 OR 11 x 5 x 43 = 2365 for detailed fingering)
+history_length: 1
+action_dim: 18
+action_idxs: [4, 5, 6, 8, 9, 10, 12, 13, 14] 
+action_high: [0.22, 0.15, 0.15, 0.22, 0.15, 0.15, 0.22, 0.15, 0.15]

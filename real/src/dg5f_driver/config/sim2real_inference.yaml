@@ -1,0 +1,25 @@
+folder: FOLDER_NAME
+ckpt_num: 901
+sheet_music: PATH_TO/handelbot/music_data/hotcrossbuns.pkl
+root: PATH_TO/handelbot
+device: cuda
+policy_freq: 10
+use_sim_obs: False
+num_trajectories: 5
+obs_dim: 1219
+action_dim: 30
+
+# Offsets
+left_offsets:
+  - [0.01, 0.033, -0.037]
+  - [0.01, 0.033, -0.037]
+  - [0.01, 0.033, -0.037]
+  - [0.01, 0.033, -0.037]
+  - [0.01, 0.033, -0.037]
+
+right_offsets:
+  - [0.02, 0.01, -0.01]
+  - [0.02, 0.01, -0.01]
+  - [0.02, 0.01, -0.01]
+  - [0.02, 0.01, -0.01]
+  - [0.02, 0.01, -0.01]

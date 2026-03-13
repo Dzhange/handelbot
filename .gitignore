@@ -1,0 +1,12 @@
+__pycache__
+/results
+/runs
+/wandb
+FluidR3_GM.sf2
+/logs
+data/
+real/build
+real/install
+real/log
+real/ckpts
+/rollouts_rl

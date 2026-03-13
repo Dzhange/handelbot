@@ -1,0 +1,21 @@
+enable_right_arm: True
+enable_left_arm: True
+enable_right_hand: True
+enable_left_hand: True
+
+right_arm_controller:
+  server_ip: "tcp://172.16.0.12:4242"
+
+left_arm_controller:
+  server_ip: "tcp://172.16.0.1:4242"
+
+randomize_init: 0
+min_bound: [0.35, -0.24, 0.04]
+max_bound: [0.85, 0.24, 0.5]
+
+# disable for timing reasons
+enable_arm_plot: False 
+enable_finger_plot: False
+
+control_freq: 80
+policy_freq: 10
