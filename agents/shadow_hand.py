@@ -13,30 +13,10 @@ PACKAGE_ASSET_DIR = _HERE.parent / "assets" / "shadow_hand"
 
 
 def make_shadow_hand_qpos():
-    """
-    Shadow Hand has 24 joints in this URDF.
-
-    Current idea:
-    - Keep the whole hand/arm base pose pointing to the piano.
-    - Do not rotate the whole robot again.
-    - Use the first joints, especially wrist_joint, to rotate the palm.
-
-    Joint order roughly follows:
-    0 forearm_joint
-    1 wrist_joint
-    2-6 thumb joints
-    7-10 index finger joints
-    11-14 middle finger joints
-    15-18 ring finger joints
-    19-23 little finger joints
-    """
     qpos = np.zeros(24)
 
-    # Keep forearm mostly unchanged.
+    # Keep forearm and wrist neutral for now.
     qpos[0] = 0.0
-
-    # Rotate wrist so the palm has a chance to face the piano keys.
-    # If palm flips the wrong way, try changing this to -np.pi / 2.
     qpos[1] = 0.0
 
     return qpos
@@ -45,11 +25,6 @@ def make_shadow_hand_qpos():
 class ShadowHandBase(BaseAgent):
     """
     Minimal Shadow Hand agent for HandelBot load/pose test.
-
-    Current goal:
-    - Load Shadow Hand into Piano-Bimanual simulation
-    - Keep the arm direction facing the piano
-    - Adjust palm direction using initial joint qpos instead of rotating the whole robot
     """
 
     disable_self_collisions = False
@@ -70,9 +45,6 @@ class ShadowHandBase(BaseAgent):
         "little_finger_distal",
     ]
 
-    # Joint names from shadow_hand.urdf
-    # Important: the URDF has a typo:
-    # "index_finger_join2" instead of "index_finger_joint2"
     hand_joint_names = [
         "forearm_joint",
         "wrist_joint",
@@ -155,11 +127,16 @@ class ShadowHandLeft(ShadowHandBase):
             qpos=make_shadow_hand_qpos(),
             qvel=np.zeros(24),
 
-            # Keep the whole hand facing the piano.
-            # Do not add extra x/z rotation here, because that moves the whole arm sideways.
+            # Left hand: test extra 180-degree rotation.
             pose=sapien.Pose(
                 p=[0.60, 0.16, 0.24],
-                q=qmult(euler2quat(np.pi / 2, 0, 0), euler2quat(0, np.pi / 2, 0)),
+                q=qmult(
+                    euler2quat(np.pi, 0, 0),
+                    qmult(
+                        euler2quat(np.pi / 2, 0, 0),
+                        euler2quat(0, np.pi / 2, 0),
+                    ),
+                ),
             ),
         ),
     )
@@ -174,9 +151,13 @@ class ShadowHandRight(ShadowHandBase):
             qpos=make_shadow_hand_qpos(),
             qvel=np.zeros(24),
 
+            # Right hand: restored to previous stable pose.
             pose=sapien.Pose(
                 p=[0.60, -0.16, 0.24],
-                q=qmult(euler2quat(np.pi / 2, 0, 0), euler2quat(0, np.pi / 2, 0)),
+                q=qmult(
+                    euler2quat(np.pi / 2, 0, 0),
+                    euler2quat(0, np.pi / 2, 0),
+                ),
             ),
         ),
     )
