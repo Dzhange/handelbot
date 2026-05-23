@@ -6,23 +6,50 @@ from mani_skill.agents.base_agent import BaseAgent, Keyframe
 from mani_skill.agents.controllers import PDJointPosControllerConfig
 from mani_skill.agents.registration import register_agent
 from transforms3d.euler import euler2quat
+from transforms3d.quaternions import qmult
 
 _HERE = Path(__file__).parent
 PACKAGE_ASSET_DIR = _HERE.parent / "assets" / "shadow_hand"
 
 
+def make_shadow_hand_qpos():
+    """
+    Shadow Hand has 24 joints in this URDF.
+
+    Current idea:
+    - Keep the whole hand/arm base pose pointing to the piano.
+    - Do not rotate the whole robot again.
+    - Use the first joints, especially wrist_joint, to rotate the palm.
+
+    Joint order roughly follows:
+    0 forearm_joint
+    1 wrist_joint
+    2-6 thumb joints
+    7-10 index finger joints
+    11-14 middle finger joints
+    15-18 ring finger joints
+    19-23 little finger joints
+    """
+    qpos = np.zeros(24)
+
+    # Keep forearm mostly unchanged.
+    qpos[0] = 0.0
+
+    # Rotate wrist so the palm has a chance to face the piano keys.
+    # If palm flips the wrong way, try changing this to -np.pi / 2.
+    qpos[1] = 0.0
+
+    return qpos
+
+
 class ShadowHandBase(BaseAgent):
     """
-    Minimal Shadow Hand agent for loading test.
+    Minimal Shadow Hand agent for HandelBot load/pose test.
 
-    Goal for now:
-    - Register shadow_hand_left / shadow_hand_right as ManiSkill agents
-    - Load Shadow Hand URDF
-    - Provide the interface that PianoBimanualEnv expects:
-      palm_pose, floating_hand_pose, finger_tip_pose
-    - Use simple joint position control for the hand joints
-
-    This is not the final training-ready Shadow Hand agent yet.
+    Current goal:
+    - Load Shadow Hand into Piano-Bimanual simulation
+    - Keep the arm direction facing the piano
+    - Adjust palm direction using initial joint qpos instead of rotating the whole robot
     """
 
     disable_self_collisions = False
@@ -33,7 +60,6 @@ class ShadowHandBase(BaseAgent):
 
     urdf_path = f"{PACKAGE_ASSET_DIR}/urdf/shadow_hand.urdf"
 
-    # Link names from shadow_hand.urdf
     palm_link = "palm"
 
     finger_tip_links = [
@@ -45,7 +71,8 @@ class ShadowHandBase(BaseAgent):
     ]
 
     # Joint names from shadow_hand.urdf
-    # Note: the URDF has a typo: "index_finger_join2" instead of "index_finger_joint2"
+    # Important: the URDF has a typo:
+    # "index_finger_join2" instead of "index_finger_joint2"
     hand_joint_names = [
         "forearm_joint",
         "wrist_joint",
@@ -87,14 +114,10 @@ class ShadowHandBase(BaseAgent):
 
     @property
     def floating_hand_pose(self):
-        # The original Delto agent has floating_hand_pose.
-        # For this minimal Shadow Hand test, we use palm_pose as a substitute.
         return self.palm_pose
 
     @property
     def ee_pose(self):
-        # Some parts of the HandelBot environment may expect ee_pose.
-        # For a hand-only Shadow Hand agent, use palm_pose for now.
         return self.palm_pose
 
     @property
@@ -102,9 +125,6 @@ class ShadowHandBase(BaseAgent):
         return [self.get_link_pose(link_name) for link_name in self.finger_tip_links]
 
     def get_proprioception(self):
-        # Minimal proprioception.
-        # The original Delto agent returns pose + qpos.
-        # For now, return qpos so the environment can continue loading.
         return dict(qpos=self.robot.get_qpos())
 
     @property
@@ -132,11 +152,14 @@ class ShadowHandLeft(ShadowHandBase):
 
     keyframes = dict(
         piano_bimanual=Keyframe(
-            qpos=np.zeros(24),
+            qpos=make_shadow_hand_qpos(),
             qvel=np.zeros(24),
+
+            # Keep the whole hand facing the piano.
+            # Do not add extra x/z rotation here, because that moves the whole arm sideways.
             pose=sapien.Pose(
-                p=[0, 0.25, 0.2],
-                q=euler2quat(0, 0, 0),
+                p=[0.60, 0.16, 0.24],
+                q=qmult(euler2quat(np.pi / 2, 0, 0), euler2quat(0, np.pi / 2, 0)),
             ),
         ),
     )
@@ -148,11 +171,12 @@ class ShadowHandRight(ShadowHandBase):
 
     keyframes = dict(
         piano_bimanual=Keyframe(
-            qpos=np.zeros(24),
+            qpos=make_shadow_hand_qpos(),
             qvel=np.zeros(24),
+
             pose=sapien.Pose(
-                p=[0, -0.25, 0.2],
-                q=euler2quat(0, 0, 0),
+                p=[0.60, -0.16, 0.24],
+                q=qmult(euler2quat(np.pi / 2, 0, 0), euler2quat(0, np.pi / 2, 0)),
             ),
         ),
     )
